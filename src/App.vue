@@ -39,6 +39,7 @@ export default {
       chartCloseLabel: [],
       chartLastCloseVals: [],
       chartAvgCloseVals: [],
+      chartOpenOtherAvg: [],
       chartObj: [],
     }
   },
@@ -50,15 +51,21 @@ export default {
     WorkOrders
   },
   beforeMount() {
-    this.filterMotor('5773d676c8af3c98451361a7');
+    this.filterMotor('5773df56c8af3c984513abd6');
   },
   methods: {
       filterMotor(motor) {
         this.oneMotorData = this.allMotorData.filter(function(item){
         return item.AssetId === motor; })
-        this.prepData(this.oneMotorData)
+
+        let otherMotorData = [];
+
+        otherMotorData = this.allMotorData.filter(function(item){
+        return item.AssetId != motor && item.AssetID !=""; })
+        this.prepData(this.oneMotorData, otherMotorData)
       },
-      prepData(data) {
+      prepData(data, otherMotorData) {
+        ///get open data
         let openData = data.filter(function(item){
         return item.Direction === 'Open'; })
 
@@ -66,12 +73,36 @@ export default {
         return a.Position-b.Position
         })
 
+        let openOtherData = otherMotorData.filter(function(item){
+        return item.Direction === 'Open'; })
+        // console.log(openOtherData)
+
+
         for (let i =0; i < openData.length; i++) {
           this.chartOpenLabel.push(openData[i].Position)
           this.chartLastOpenVals.push(openData[i].LastTorque)
           this.chartAvgOpenVals.push(openData[i].AverageTorque)
+
+          let openOtherDataAtPosition = openOtherData.filter(function(item){
+          return item.Position === i; })
+
+          
+          // console.log(openOtherDataAtPosition)
+          // let totalOtherAvg = 0
+
+          // for (let j=0; i < openOtherDataAtPosition.length; j++) {
+          //     if (openOtherDataAtPosition[j] != undefined) {
+          //       console.log(openOtherDataAtPosition[j].AverageTorque)
+          //     }
+          //     // totalOtherAvg += openOtherDataAtPosition[j].AverageTorque
+          // }
+
+          // this.chartOpenOtherAvg.push(totalOtherAvg/openOtherDataAtPosition.length)
+          
         }
 
+          console.log(this.chartOpenOtherAvg)
+        ///Get Close Data
         let closeData = data.filter(function(item){
         return item.Direction === 'Open'; })
 
@@ -91,7 +122,7 @@ export default {
                           this.chartCloseLabel,
                           this.chartLastCloseVals,
                           this.chartAvgCloseVals]
-      }
+        }
   }
 }
 </script>
