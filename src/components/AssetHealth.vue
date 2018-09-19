@@ -3,7 +3,7 @@
         <slot name="assetHealth">
             <h1>OPEN</h1>
             <Chart1 :chartObj="chartObj" class="chart"></Chart1>
-            <h1>CLOSE</h1>
+            <h1>CLOSED</h1>
             <Chart2 :chartObj="chartObj" class="chart"></Chart2>
         </slot>
     </div>

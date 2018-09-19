@@ -87,21 +87,21 @@ export default {
           return item.Position === i; })
 
           
-          // console.log(openOtherDataAtPosition)
-          // let totalOtherAvg = 0
+          let totalOther = 0
+          let count = 0
 
-          // for (let j=0; i < openOtherDataAtPosition.length; j++) {
-          //     if (openOtherDataAtPosition[j] != undefined) {
-          //       console.log(openOtherDataAtPosition[j].AverageTorque)
-          //     }
-          //     // totalOtherAvg += openOtherDataAtPosition[j].AverageTorque
-          // }
+          for (let otherObj of openOtherDataAtPosition) {
+            totalOther += otherObj.AverageTorque
+            count++
+          }
 
-          // this.chartOpenOtherAvg.push(totalOtherAvg/openOtherDataAtPosition.length)
+          let totalOtherAvg = totalOther/count
+          
+          this.chartOpenOtherAvg.push(totalOtherAvg)
           
         }
-
-          console.log(this.chartOpenOtherAvg)
+        console.log(this.chartOpenLabel.length)
+        console.log(this.chartOpenOtherAvg)
         ///Get Close Data
         let closeData = data.filter(function(item){
         return item.Direction === 'Open'; })
