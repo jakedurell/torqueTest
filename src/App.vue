@@ -1,9 +1,9 @@
-<template scope="{signal}">
+<template>
 <div id="app">
-  <div class="container">
+  <div class="containerx">
       <div class="row">
         <LeftPanel class="left-panel col-xs-3"></LeftPanel>
-          <div class="col-xs-9">
+          <div class="col-xs-9 app-body">
               <br>
               <button class="btn btn-primary" @click="selectedComponent = 'Dashboard'">Dashboard</button>
               <button class="btn btn-success" @click="selectedComponent = 'AssetHealth'">Asset Health</button>
@@ -19,6 +19,7 @@
 </template>
 
 <script>
+/* eslint-disable */
 import LeftPanel from './components/LeftPanel'
 import Dashboard from './components/Dashboard'
 import AssetHealth from './components/AssetHealth'
@@ -31,9 +32,14 @@ export default {
       quoteTitle: 'The Quote',
       selectedComponent: 'AssetHealth',
       allMotorData: allData,
-      chartLabels: [],
-      chartVals: [],
-      chartObj: []
+      oneMotorData: [],
+      chartOpenLabel: [],
+      chartLastOpenVals: [],
+      chartAvgOpenVals: [],
+      chartCloseLabel: [],
+      chartLastCloseVals: [],
+      chartAvgCloseVals: [],
+      chartObj: [],
     }
   },
   name: 'App',
@@ -48,21 +54,43 @@ export default {
   },
   methods: {
       filterMotor(motor) {
-        this.allMotorData = this.allMotorData.filter(function(item){
+        this.oneMotorData = this.allMotorData.filter(function(item){
         return item.AssetId === motor; })
-        this.prepData(this.allMotorData)
+        this.prepData(this.oneMotorData)
       },
       prepData(data) {
-        data.sort(function(a, b){
+        let openData = data.filter(function(item){
+        return item.Direction === 'Open'; })
+
+        openData.sort(function(a, b){
         return a.Position-b.Position
         })
 
-        for (let i =0; i < data.length; i++) {
-          this.chartLabels.push(data[i].Position)
-          this.chartVals.push(data[i].LastTorque)
+        for (let i =0; i < openData.length; i++) {
+          this.chartOpenLabel.push(openData[i].Position)
+          this.chartLastOpenVals.push(openData[i].LastTorque)
+          this.chartAvgOpenVals.push(openData[i].AverageTorque)
         }
-        this.chartObj = [this.chartLabels, this.chartVals]
-        console.log(this.chartObj)
+
+        let closeData = data.filter(function(item){
+        return item.Direction === 'Open'; })
+
+        closeData.sort(function(a, b){
+        return a.Position-b.Position
+        })
+
+        for (let i =0; i < openData.length; i++) {
+          this.chartCloseLabel.push(closeData[i].Position)
+          this.chartLastCloseVals.push(closeData[i].LastTorque)
+          this.chartAvgCloseVals.push(closeData[i].AverageTorque)
+        }
+        
+        this.chartObj = [ this.chartOpenLabel, 
+                          this.chartLastOpenVals, 
+                          this.chartAvgOpenVals,
+                          this.chartCloseLabel,
+                          this.chartLastCloseVals,
+                          this.chartAvgCloseVals]
       }
   }
 }
@@ -78,8 +106,11 @@ export default {
   margin-top: 60px;
 }
 
-.left-panel {
-  width: 25%;
+
+
+.containerx {
+  margin: 20px !important;
 }
+
 
 </style>
