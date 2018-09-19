@@ -1,44 +1,48 @@
 <template>
-  <div id="app">
-    <div class="container">
-        <div class="row">
-          <LeftPanel class="left-panel col-xs-3"></LeftPanel>
-            <div class="col-xs-9">
-                <br>
-                <button class="btn btn-primary" @click="selectedComponent = 'Dashboard'">Dashboard</button>
-                <button class="btn btn-success" @click="selectedComponent = 'AssetHealth'">Asset Health</button>
-                <button class="btn btn-danger"  @click="selectedComponent = 'WorkOrders'">Work Orders</button>
-                <hr>
-                <keep-alive>
-                    <component :is="selectedComponent">
-                        <p slot="Dashboard">I am a blue box!</p>
-                        <p slot="AssetHealth">I am a green box!</p>
-                        <p slot="WorkOrders">I am a red box!</p>
-                    </component>
-                </keep-alive>
-            </div>
-        </div>
-    </div>
-
-
+<div id="app">
+  <div class="containerx">
+      <div class="row">
+        <LeftPanel class="left-panel col-xs-3"></LeftPanel>
+          <div class="col-xs-9 app-body">
+              <br>
+              <button class="btn btn-primary" @click="selectedComponent = 'Dashboard'">Dashboard</button>
+              <button class="btn btn-success" @click="selectedComponent = 'AssetHealth'">Asset Health</button>
+              <button class="btn btn-danger"  @click="selectedComponent = 'WorkOrders'">Work Orders</button>
+              <hr>
+              <Dashboard v-show="selectedComponent === 'Dashboard'" ></Dashboard>
+              <AssetHealth v-show="selectedComponent === 'AssetHealth'" :chartObj="chartObj" ></AssetHealth>
+              <WorkOrders v-show="(selectedComponent === 'WorkOrders')" ></WorkOrders>
+          </div>
+      </div>
   </div>
+</div>
 </template>
 
 <script>
+/* eslint-disable */
 import LeftPanel from './components/LeftPanel'
 import Dashboard from './components/Dashboard'
 import AssetHealth from './components/AssetHealth'
 import WorkOrders from './components/WorkOrders'
-import allMotorData from './assets/data.js'
+import allData from './assets/data.js'
 
 export default {
   data: function() {
-            return {
-                quoteTitle: 'The Quote',
-                selectedComponent: 'AssetHealth',
-                allData:  allMotorData,
-            }
-        },
+  return {
+      quoteTitle: 'The Quote',
+      selectedComponent: 'AssetHealth',
+      allMotorData: allData,
+      oneMotorData: [],
+      chartOpenLabel: [],
+      chartLastOpenVals: [],
+      chartAvgOpenVals: [],
+      chartCloseLabel: [],
+      chartLastCloseVals: [],
+      chartAvgCloseVals: [],
+      chartOpenOtherAvg: [],
+      chartObj: [],
+    }
+  },
   name: 'App',
   components: {
     LeftPanel,
@@ -47,15 +51,78 @@ export default {
     WorkOrders
   },
   beforeMount() {
-    this.filterMotor('5773d676c8af3c98451361a7');
+    this.filterMotor('5773df56c8af3c984513abd6');
   },
   methods: {
       filterMotor(motor) {
-        console.log(this.allData)
-        this.allData = this.allData.filter(function(item){
-        return this.allData.AssetId === motor; })
-        console.log(this.allData)
-      }
+        this.oneMotorData = this.allMotorData.filter(function(item){
+        return item.AssetId === motor; })
+
+        let otherMotorData = [];
+
+        otherMotorData = this.allMotorData.filter(function(item){
+        return item.AssetId != motor && item.AssetID !=""; })
+        this.prepData(this.oneMotorData, otherMotorData)
+      },
+      prepData(data, otherMotorData) {
+        ///get open data
+        let openData = data.filter(function(item){
+        return item.Direction === 'Open'; })
+
+        openData.sort(function(a, b){
+        return a.Position-b.Position
+        })
+
+        let openOtherData = otherMotorData.filter(function(item){
+        return item.Direction === 'Open'; })
+        // console.log(openOtherData)
+
+
+        for (let i =0; i < openData.length; i++) {
+          this.chartOpenLabel.push(openData[i].Position)
+          this.chartLastOpenVals.push(openData[i].LastTorque)
+          this.chartAvgOpenVals.push(openData[i].AverageTorque)
+
+          let openOtherDataAtPosition = openOtherData.filter(function(item){
+          return item.Position === i; })
+
+          
+          // console.log(openOtherDataAtPosition)
+          // let totalOtherAvg = 0
+
+          // for (let j=0; i < openOtherDataAtPosition.length; j++) {
+          //     if (openOtherDataAtPosition[j] != undefined) {
+          //       console.log(openOtherDataAtPosition[j].AverageTorque)
+          //     }
+          //     // totalOtherAvg += openOtherDataAtPosition[j].AverageTorque
+          // }
+
+          // this.chartOpenOtherAvg.push(totalOtherAvg/openOtherDataAtPosition.length)
+          
+        }
+
+          console.log(this.chartOpenOtherAvg)
+        ///Get Close Data
+        let closeData = data.filter(function(item){
+        return item.Direction === 'Open'; })
+
+        closeData.sort(function(a, b){
+        return a.Position-b.Position
+        })
+
+        for (let i =0; i < openData.length; i++) {
+          this.chartCloseLabel.push(closeData[i].Position)
+          this.chartLastCloseVals.push(closeData[i].LastTorque)
+          this.chartAvgCloseVals.push(closeData[i].AverageTorque)
+        }
+        
+        this.chartObj = [ this.chartOpenLabel, 
+                          this.chartLastOpenVals, 
+                          this.chartAvgOpenVals,
+                          this.chartCloseLabel,
+                          this.chartLastCloseVals,
+                          this.chartAvgCloseVals]
+        }
   }
 }
 </script>
@@ -70,8 +137,11 @@ export default {
   margin-top: 60px;
 }
 
-.left-panel {
-  width: 25%;
+
+
+.containerx {
+  margin: 20px !important;
 }
+
 
 </style>
