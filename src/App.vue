@@ -12,7 +12,7 @@
                 <keep-alive>
                     <component :is="selectedComponent">
                         <p slot="Dashboard">I am a blue box!</p>
-                        <p slot="AssetHealth">I am a green box!</p>
+                        <p :chartData="allMotorData"  slot="AssetHealth">I am a green box!</p>
                         <p slot="WorkOrders">I am a red box!</p>
                     </component>
                 </keep-alive>
@@ -29,14 +29,14 @@ import LeftPanel from './components/LeftPanel'
 import Dashboard from './components/Dashboard'
 import AssetHealth from './components/AssetHealth'
 import WorkOrders from './components/WorkOrders'
-import allMotorData from './assets/data.js'
+import allData from './assets/data.js'
 
 export default {
   data: function() {
             return {
                 quoteTitle: 'The Quote',
                 selectedComponent: 'AssetHealth',
-                allData:  allMotorData,
+                allMotorData:  allData,
             }
         },
   name: 'App',
@@ -51,10 +51,8 @@ export default {
   },
   methods: {
       filterMotor(motor) {
-        console.log(this.allData)
-        this.allData = this.allData.filter(function(item){
-        return this.allData.AssetId === motor; })
-        console.log(this.allData)
+        this.allMotorData = this.allMotorData.filter(function(item){
+        return item.AssetId === motor; })
       }
   }
 }

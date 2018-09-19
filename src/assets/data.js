@@ -111599,4 +111599,6 @@ var allData = [
     Profile: 58,
     id: '577a7427a251736809f399c4'
   }
-];
+]
+
+export default allData;

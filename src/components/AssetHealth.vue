@@ -1,10 +1,20 @@
 <template>
     <div>
-        <slot name="assetHealth"></slot>
+        <slot name="assetHealth">
+            <Chart1 :chartData="chartData"></Chart1>
+        </slot>
     </div>
 </template>
 
 <script>
+import Chart1 from './Chart1'
+
+export default {
+props: ['chartData'],
+  components: {
+    Chart1,
+  }
+}
 
 </script>
 
